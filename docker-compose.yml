@@ -8,9 +8,11 @@ services:
       - POSTGRES_PASSWORD=postgres
     volumes:
       - ./conf/postgres/docker-entrypoint-initdb.d:/docker-entrypoint-initdb.d
+      - postgres:/var/lib/postgresql/data
 
   zookeeper:
     container_name: zookeeper
+    restart: always
     image: znly/zookeeper:3.4.8
     environment:
       - ZOO_ID=1
@@ -18,41 +20,66 @@ services:
 
   overlord:
     container_name: overlord
+    restart: always
     image: rusnyder/druid:latest
     ports:
       - 8090:8090
+    environment:
+      - JAVA_EXTRA_OPTIONS=-Xmx1g -Xms1m
+    links:
+      - zookeeper:zookeeper
+      - postgres:postgres
     command:
       - overlord
 
   coordinator:
     container_name: coordinator
+    restart: always
     image: rusnyder/druid:latest
     ports:
       - 8081:8081
+    links:
+      - zookeeper:zookeeper
+      - postgres:postgres
     command:
       - coordinator
 
   middlemanager:
     container_name: middlemanager
+    restart: always
     image: rusnyder/druid:latest
     ports:
       - 8091:8091
+      - 8100-8199:8100-8199
+    environment:
+      - JAVA_EXTRA_OPTIONS=-Xmx64m -Xms64m
+    links:
+      - zookeeper:zookeeper
+      - postgres:postgres
     command:
       - middleManager
 
   historical:
     container_name: historical
+    restart: always
     image: rusnyder/druid:latest
     ports:
       - 8093:8093
+    links:
+      - zookeeper:zookeeper
+      - postgres:postgres
     command:
       - historical
 
   broker:
     container_name: broker
+    restart: always
     image: rusnyder/druid:latest
     ports:
       - 8082:8082
+    links:
+      - zookeeper:zookeeper
+      - postgres:postgres
     command:
       - broker
 
@@ -61,35 +88,33 @@ services:
     image: rusnyder/tranquility:latest
     ports:
       - 8200:8200
+    volumes:
+      - ./conf/tranquility:/etc/tranquility
+    environment:
+      TRANQUILITY_CONFIG_FILE: /etc/tranquility/config.json
+      TRANQUILITY_PROPERTIES_ZOOKEEPER_CONNECT: zookeeper:2181
+    links:
+      - zookeeper:zookeeper
+      - broker:broker
+      - coordinator:coordinator
+      - historical:historical
+      - middlemanager:middlemanager
+      - overlord:overlord
 
   superset:
     container_name: superset
+    restart: always
     image: amancevice/superset
+    environment:
+      - PYTHONPAT=$WHEREYOURCONFIGIS:$PYTHONPATH
     ports:
       - 8088:8088
+    links:
+      - broker:broker
+      - coordinator:coordinator
     volumes:
-      - ./.superset:/home/superset/.superset
+      - ./.superset:/etc/superset
 
-  swiv:
-    container_name: swiv
-    image: rusnyder/swiv:latest
-    ports:
-      - 9090:9090
-    environment:
-      DRUID_BROKER: broker:8082
-
-  metabase:
-    container_name: metabase
-    image: metabase/metabase
-    ports:
-      - 3000:3000
-    environment:
-      MB_DB_TYPE: postgres
-      MB_DB_DBNAME: metabase
-      MB_DB_PORT: 5432
-      MB_DB_USER: metabase
-      MB_DB_PASS: metabase
-      MB_DB_HOST: postgres
-    volumes:
-      - ./.metabase-data:/metabase-data
-
+volumes:
+  postgres:
+    external: true

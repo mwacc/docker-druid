@@ -1,3 +1,21 @@
+Windows users
+=============
+allocate at least 6 GB RAM and 2 CPUs to docker.
+execute in powershell
+`$Env:COMPOSE_CONVERT_WINDOWS_PATHS=1`
+before running docker-compose commands to resolve windows paths conversion
+
+Create external volumes
+======================
+To overcome this [issue]: https://github.com/mattermost/mattermost-docker/issues/178, external volume shall be created in advance 
+`docker volume create postgres`
+
+Superset init
+==============
+run the following command for initialization
+`docker exec -it superset superset-init`
+
+
 Docker Druid
 ================
 
