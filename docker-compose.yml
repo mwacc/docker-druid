@@ -21,7 +21,7 @@ services:
   overlord:
     container_name: overlord
     restart: always
-    image: rusnyder/druid:latest
+    image: druid:latest
     ports:
       - 8090:8090
     environment:
@@ -35,7 +35,7 @@ services:
   coordinator:
     container_name: coordinator
     restart: always
-    image: rusnyder/druid:latest
+    image: druid:latest
     ports:
       - 8081:8081
     links:
@@ -47,7 +47,7 @@ services:
   middlemanager:
     container_name: middlemanager
     restart: always
-    image: rusnyder/druid:latest
+    image: druid:latest
     ports:
       - 8091:8091
       - 8100-8199:8100-8199
@@ -62,7 +62,7 @@ services:
   historical:
     container_name: historical
     restart: always
-    image: rusnyder/druid:latest
+    image: druid:latest
     ports:
       - 8093:8093
     links:
@@ -74,7 +74,7 @@ services:
   broker:
     container_name: broker
     restart: always
-    image: rusnyder/druid:latest
+    image: druid:latest
     ports:
       - 8082:8082
     links:

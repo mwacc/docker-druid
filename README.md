@@ -1,3 +1,5 @@
+Modified Docker based Druid and Superset environment with external metastore in Postgre
+
 Windows users
 =============
 allocate at least 6 GB RAM and 2 CPUs to docker.
@@ -7,13 +9,8 @@ before running docker-compose commands to resolve windows paths conversion
 
 Create external volumes
 ======================
-To overcome this [issue]: https://github.com/mattermost/mattermost-docker/issues/178, external volume shall be created in advance 
+To overcome this [issue]: https://github.com/mattermost/mattermost-docker/issues/178, external volume shall be created in advance
 `docker volume create postgres`
-
-Superset init
-==============
-run the following command for initialization
-`docker exec -it superset superset-init`
 
 
 Docker Druid
@@ -73,7 +70,14 @@ The image contains the full druid distribution and use the default druid cli. If
 
 If you plan to use this image on your local machine, be carefull with the JVM heap spaces required by default (some services are launched with 15gb heap space).
 
-The docker-compose file is setup to run on a macbook.
+The docker-compose file was tested on Windows 10 in PowerShell
+
+Superset init
+==============
+run the following command for initialization
+`docker exec -it superset superset-init`
+
+
 
 Documentation
 =============

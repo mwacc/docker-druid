@@ -2,7 +2,7 @@ FROM openjdk:8-jre-alpine
 MAINTAINER Russell Snyder <ru.snyder@gmail.com>
 
 # Java config
-ENV DRUID_VERSION   0.10.0
+ENV DRUID_VERSION   0.12.0
 
 # Druid env variable
 ENV DRUID_XMX           '-'
